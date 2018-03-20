@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MyTaskManager</string>
+    <string name="first">Несрочно и неважно </string>
+    <string name="second">Несрочно, но важно </string>
+    <string name="third">Срочно, но неважно </string>
+    <string name="forth">Срочно и важно </string>
+    <string name="add">Добавить</string>
+</resources>
