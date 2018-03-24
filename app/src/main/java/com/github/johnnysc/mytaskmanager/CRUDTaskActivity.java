@@ -86,6 +86,8 @@ public class CRUDTaskActivity extends BaseActivity {
         initUi();
     }
 
+    //region LifeCycle
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -93,11 +95,6 @@ public class CRUDTaskActivity extends BaseActivity {
         mDeleteMenuItem = menu.findItem(R.id.delete_task);
         mDeleteMenuItem.setVisible(false);
         return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -144,6 +141,8 @@ public class CRUDTaskActivity extends BaseActivity {
         initInputs();
         initActionButton();
     }
+
+    //endregion
 
     private void initTitle() {
         setTitle(isActionTypeCreate() ? R.string.create_task : R.string.view_task);

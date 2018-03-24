@@ -19,7 +19,8 @@ import java.util.Map;
 
 import io.realm.RealmList;
 
-import static com.github.johnnysc.mytaskmanager.model.CategoryType.*;
+import static com.github.johnnysc.mytaskmanager.model.CategoryType.CATEGORY_TYPES;
+import static com.github.johnnysc.mytaskmanager.model.CategoryType.TaskType;
 
 /**
  * Contains 4 categories equal parts on screen and buttons on them,
