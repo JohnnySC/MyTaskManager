@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.johnnysc.mytaskmanager.model.Category;
 import com.github.johnnysc.mytaskmanager.model.Task;
@@ -29,7 +28,7 @@ import static com.github.johnnysc.mytaskmanager.model.CategoryType.*;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int ADD_REQUEST_CODE = 1;
+    private static final int REQUEST_CODE = 1;
 
     private static final Map<Integer, Integer> MAIN_MAP = new HashMap<>();
     private static final List<MainActivity.MainItem> MAIN_ITEMS = new ArrayList<>();
@@ -57,7 +56,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             updateMainItemsTexts();
         }
     }
@@ -66,8 +65,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         for (Map.Entry<Integer, Integer> entry : MAIN_MAP.entrySet()) {
             if (view.getId() == entry.getKey()) {
-                Toast.makeText(this, "layout tapped " + entry.getValue(), Toast.LENGTH_SHORT).show();
-//                startActivity(DetailActivity.newIntent(this, entry.getValue()));
+                startActivityForResult(DetailActivity.newIntent(this, entry.getValue()), REQUEST_CODE);
                 break;
             }
         }
@@ -94,7 +92,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void handleButtonClick(@TaskType int taskType) {
-        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDTaskActivity.CREATE), ADD_REQUEST_CODE);
+        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDTaskActivity.CREATE), REQUEST_CODE);
     }
 
     private int getNotDoneTasksCount(RealmList<Task> tasks) {

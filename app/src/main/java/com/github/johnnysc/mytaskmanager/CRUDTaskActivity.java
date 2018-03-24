@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IntDef;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -23,8 +21,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import io.realm.Realm;
 
 /**
  * Here we can create, read, update and delete the task.
@@ -43,23 +39,18 @@ public class CRUDTaskActivity extends BaseActivity {
     public @interface TaskActionType {
     }
 
-    private static final String EXTRA_TASK_TYPE = "extra_task_type";
     private static final String EXTRA_ACTION_TYPE = "extra_action_type";
     private static final String EXTRA_TASK_ID = "extra_task_id";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final int INPUT_MIN_LENGTH = 4;
 
-    @CategoryType.TaskType
-    private int mTaskType;
     @TaskActionType
     private int mActionType;
     private long mTaskId;
 
-    private Toolbar mToolbar;
     private TextView mDateTextView;
     private TextInputEditText mTitleEditText;
     private TextInputEditText mBodyEditText;
-    private FloatingActionButton mActionButton;
     private AppCompatSpinner mSpinner;
     private ArrayAdapter<String> mSpinnerAdapter;
     private TextWatcher mTextWatcher;
@@ -87,8 +78,8 @@ public class CRUDTaskActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crud_task);
-        initExtraData();
         initUi();
+        // TODO: 24.03.18 add checkbox-like thing for property done
     }
 
     @Override
@@ -107,8 +98,10 @@ public class CRUDTaskActivity extends BaseActivity {
             mActionButton.setImageResource(android.R.drawable.ic_menu_edit);
             mTitleEditText.setEnabled(false);
             mBodyEditText.setEnabled(false);
+            // TODO: 24.03.18 things with focusable to change keyboard visibility
             mTitleEditText.setText(mInitialTitle);
             mBodyEditText.setText(mInitialBody);
+            mActionButton.setEnabled(true);
             // TODO: 24.03.18 hide delete item in toolbar
         } else {
             super.onBackPressed();
@@ -116,6 +109,7 @@ public class CRUDTaskActivity extends BaseActivity {
     }
 
     private void initUi() {
+        initTitle();
         initToolbar();
         initSpinner();
         initDate();
@@ -123,10 +117,7 @@ public class CRUDTaskActivity extends BaseActivity {
         initActionButton();
     }
 
-    private void initToolbar() {
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    private void initTitle() {
         setTitle(isActionTypeCreate() ? R.string.create_task : R.string.view_task);
     }
 
@@ -171,17 +162,18 @@ public class CRUDTaskActivity extends BaseActivity {
         mBodyEditText.setText(mInitialBody);
         mTitleEditText.setEnabled(isActionTypeCreate());
         mBodyEditText.setEnabled(isActionTypeCreate());
+        // TODO: 24.03.18 things with focusable to change keyboard visibility
         mTitleEditText.addTextChangedListener(mTextWatcher);
         mBodyEditText.addTextChangedListener(mTextWatcher);
     }
 
     private void initActionButton() {
-        mActionButton = findViewById(R.id.action_fab);
+        initFab();
         int buttonResId = isActionTypeCreate()
                 ? android.R.drawable.ic_menu_save
                 : android.R.drawable.ic_menu_edit;
         mActionButton.setImageResource(buttonResId);
-        mActionButton.setEnabled(false);
+        mActionButton.setEnabled(!isActionTypeCreate());
         mActionButton.setOnClickListener(view -> handleActionButtonClick());
     }
 
@@ -231,8 +223,8 @@ public class CRUDTaskActivity extends BaseActivity {
         return mActionType == CREATE;
     }
 
-    private void initExtraData() {
-        mTaskType = getIntent().getIntExtra(EXTRA_TASK_TYPE, 0);
+    protected void initExtraData() {
+        super.initExtraData();
         mActionType = getIntent().getIntExtra(EXTRA_ACTION_TYPE, 0);
         mTaskId = getIntent().getLongExtra(EXTRA_TASK_ID, -1L);
     }

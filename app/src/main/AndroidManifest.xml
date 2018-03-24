@@ -20,11 +20,10 @@
         <activity
             android:name=".CRUDTaskActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Design.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".DetailActivity"
-            android:label="@string/title_activity_detail"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

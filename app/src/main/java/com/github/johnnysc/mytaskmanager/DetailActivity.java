@@ -1,24 +1,104 @@
 package com.github.johnnysc.mytaskmanager;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 
-public class DetailActivity extends AppCompatActivity {
+import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
+import com.github.johnnysc.mytaskmanager.adapter.TaskInteractListener;
+import com.github.johnnysc.mytaskmanager.model.CategoryType;
+
+/**
+ * Here is the list of all the task of chosen category
+ * it is possible to make the task done immediately from list
+ * view details and add a new one
+ */
+public class DetailActivity extends BaseActivity implements TaskInteractListener {
+
+    private static final int REQUEST_CODE = 2;
+    private TaskAdapter mAdapter;
+    private boolean mDataChanged;
+
+    public static Intent newIntent(Context context, @CategoryType.TaskType int taskType) {
+        Intent intent = new Intent(context, DetailActivity.class);
+        intent.putExtra(EXTRA_TASK_TYPE, taskType);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_crud_task);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.action_fab);
-        fab.setOnClickListener(view ->
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        setContentView(R.layout.activity_detail);
+        initAdapter();
+        initUi();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (REQUEST_CODE == requestCode && resultCode == RESULT_OK) {
+            mAdapter.notifyDataSetChanged();
+            mDataChanged = true;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDataChanged) {
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    public void setTaskDone(long id, boolean done) {
+        mRealm.executeTransaction(realm -> getTaskByPrimaryKey(id).setDone(done));
+        mDataChanged = true;
+    }
+
+    @Override
+    public void viewTask(long id) {
+        startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDTaskActivity.READ, id), REQUEST_CODE);
+    }
+
+    @Override
+    protected void initFab() {
+        super.initFab();
+        mActionButton.setImageResource(android.R.drawable.ic_input_add);
+        mActionButton.setOnClickListener(view ->
+                startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDTaskActivity.CREATE), REQUEST_CODE));
+    }
+
+    private void initAdapter() {
+        mAdapter = new TaskAdapter(this, getCategoryByPrimaryKey(mTaskType).getTasks());
+    }
+
+    private void initUi() {
+        initTitle();
+        initToolbar();
+        initDataList();
+        initFab();
+    }
+
+    private void initTitle() {
+        setTitle(CATEGORY_STRINGS.get(mTaskType));
+    }
+
+    private void initDataList() {
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(false);
+        recyclerView.setAdapter(mAdapter);
+    }
 }

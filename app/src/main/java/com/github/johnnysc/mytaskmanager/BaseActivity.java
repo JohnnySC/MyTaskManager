@@ -2,9 +2,12 @@ package com.github.johnnysc.mytaskmanager;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.github.johnnysc.mytaskmanager.model.Category;
+import com.github.johnnysc.mytaskmanager.model.CategoryType;
 import com.github.johnnysc.mytaskmanager.model.Task;
 
 import java.util.Arrays;
@@ -17,6 +20,7 @@ import io.realm.Realm;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
+    protected static final String EXTRA_TASK_TYPE = "extra_task_type";
     protected static final List<Integer> CATEGORY_STRINGS = Arrays.asList(
             R.string.first_category,
             R.string.second_category,
@@ -25,11 +29,30 @@ public abstract class BaseActivity extends AppCompatActivity {
     );
 
     protected Realm mRealm;
+    @CategoryType.TaskType
+    protected int mTaskType;
+    protected Toolbar mToolbar;
+    protected FloatingActionButton mActionButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
+        initExtraData();
+    }
+
+    protected void initExtraData() {
+        mTaskType = getIntent().getIntExtra(EXTRA_TASK_TYPE, 0);
+    }
+
+    protected void initToolbar() {
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    protected void initFab() {
+        mActionButton = findViewById(R.id.action_fab);
     }
 
     protected final Category getCategoryByPrimaryKey(int id) {
