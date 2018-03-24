@@ -9,6 +9,8 @@ import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
@@ -23,6 +25,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import io.realm.RealmResults;
+
 /**
  * Here we can create, read, update and delete the task.
  * It gets extra params as task type {@link CategoryType#CATEGORY_TYPES}
@@ -35,23 +39,15 @@ public class CRUDTaskActivity extends BaseActivity {
     public static final int CREATE = 0;
     public static final int READ = 1;
     public static final int EDIT = 2;
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({CREATE, READ, EDIT})
-    public @interface TaskActionType {
-    }
-    //endregion
-
     //region fields
     private static final String EXTRA_ACTION_TYPE = "extra_action_type";
+    //endregion
     private static final String EXTRA_TASK_ID = "extra_task_id";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final int INPUT_MIN_LENGTH = 4;
-
     @TaskActionType
     private int mActionType;
     private long mTaskId;
-
     private TextView mDateTextView;
     private TextInputEditText mTitleEditText;
     private TextInputEditText mBodyEditText;
@@ -62,8 +58,7 @@ public class CRUDTaskActivity extends BaseActivity {
     private String mInitialTitle;
     private String mInitialBody;
     private boolean mCheckBoxInitialState;
-
-    //endregion
+    private MenuItem mDeleteMenuItem;
 
     public static Intent newIntent(Context context,
                                    @CategoryType.TaskType int taskType,
@@ -75,6 +70,8 @@ public class CRUDTaskActivity extends BaseActivity {
         intent.putExtra(EXTRA_TASK_ID, taskId);
         return intent;
     }
+
+    //endregion
 
     public static Intent newIntent(Context context,
                                    @CategoryType.TaskType int taskType,
@@ -90,9 +87,26 @@ public class CRUDTaskActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.crud_menu, menu);
+        mDeleteMenuItem = menu.findItem(R.id.delete_task);
+        mDeleteMenuItem.setVisible(false);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.delete_task) {
+            deleteTask();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -111,7 +125,7 @@ public class CRUDTaskActivity extends BaseActivity {
             mBodyEditText.setText(mInitialBody);
             mCheckBox.setChecked(mCheckBoxInitialState);
             mActionButton.setEnabled(true);
-            // TODO: 24.03.18 hide delete item in toolbar
+            mDeleteMenuItem.setVisible(false);
         } else {
             if (mCheckBoxInitialState != mCheckBox.isChecked()) {
                 setResultOkAndFinish();
@@ -227,7 +241,7 @@ public class CRUDTaskActivity extends BaseActivity {
             mBodyEditText.setFocusableInTouchMode(true);
             mActionType = EDIT;
             mActionButton.setImageResource(android.R.drawable.ic_menu_save);
-            // TODO: 24.03.18 make delete item in menu visible
+            mDeleteMenuItem.setVisible(true);
         } else {
             mRealm.executeTransaction(realm -> {
                 Task task = getTaskByPrimaryKey(mTaskId);
@@ -238,6 +252,14 @@ public class CRUDTaskActivity extends BaseActivity {
             });
             setResultOkAndFinish();
         }
+    }
+
+    private void deleteTask() {
+        mRealm.executeTransaction(realm -> {
+            RealmResults<Task> rows = realm.where(Task.class).equalTo("id", mTaskId).findAll();
+            rows.clear();
+        });
+        setResultOkAndFinish();
     }
 
     private void setResultOkAndFinish() {
@@ -263,6 +285,11 @@ public class CRUDTaskActivity extends BaseActivity {
         super.initExtraData();
         mActionType = getIntent().getIntExtra(EXTRA_ACTION_TYPE, 0);
         mTaskId = getIntent().getLongExtra(EXTRA_TASK_ID, -1L);
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({CREATE, READ, EDIT})
+    public @interface TaskActionType {
     }
 
     private class InputTextWatcher implements TextWatcher {
