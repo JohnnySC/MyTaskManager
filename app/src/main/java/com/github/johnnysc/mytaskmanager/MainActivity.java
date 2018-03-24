@@ -1,7 +1,8 @@
 package com.github.johnnysc.mytaskmanager;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -17,33 +18,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.realm.Realm;
 import io.realm.RealmList;
 
 import static com.github.johnnysc.mytaskmanager.model.CategoryType.*;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+/**
+ * Contains 4 categories equal parts on screen and buttons on them,
+ * when return need to update data about tasks count that not done yet
+ */
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    private Realm mRealm;
-    private static final List<Integer> TYPES = Arrays.asList(
-            NOT_IMPORTANT_NOT_URGENT,
-            IMPORTANT_NOT_URGENT,
-            URGENT_NOT_IMPORTANT,
-            URGENT_IMPORTANT
-    );
-    private static final List<Integer> CATEGORIES = Arrays.asList(
-            R.string.first,
-            R.string.second,
-            R.string.third,
-            R.string.forth
-    );
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int ADD_REQUEST_CODE = 1;
+
     private static final Map<Integer, Integer> MAIN_MAP = new HashMap<>();
+    private static final List<MainActivity.MainItem> MAIN_ITEMS = new ArrayList<>();
+    private static final List<Integer> LAYOUT_ID_LIST = Arrays.asList(
+            R.id.first_category_layout,
+            R.id.second_category_layout,
+            R.id.third_category_layout,
+            R.id.forth_category_layout
+    );
 
     static {
-        MAIN_MAP.put(R.id.first, TYPES.get(0));
-        MAIN_MAP.put(R.id.second, TYPES.get(1));
-        MAIN_MAP.put(R.id.third, TYPES.get(2));
-        MAIN_MAP.put(R.id.forth, TYPES.get(3));
+        for (int i = 0; i < LAYOUT_ID_LIST.size(); i++) {
+            MAIN_MAP.put(LAYOUT_ID_LIST.get(i), CATEGORY_TYPES.get(i));
+        }
     }
 
     @Override
@@ -51,30 +51,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initRealm();
-        final List<MainItem> mainItems = new ArrayList<>();
-        mainItems.add(new MainItem(R.id.first));
-        mainItems.add(new MainItem(R.id.second));
-        mainItems.add(new MainItem(R.id.third));
-        mainItems.add(new MainItem(R.id.forth));
-
-        for (int i = 0; i < mainItems.size(); i++) {
-            mainItems.get(i).setRootClickListener(this);
-            final int taskType = TYPES.get(i);
-            mainItems.get(i).setButtonClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleButtonClick(taskType);
-                }
-            });
-            Category category = getByPrimaryKey(taskType);
-            String text = getString(CATEGORIES.get(i)) + "\n" + getNotDoneTasksCount(category.getTasks());
-            mainItems.get(i).setText(text);
-        }
+        initMainItems();
     }
 
-    private void handleButtonClick(@TaskType int taskType) {
-        Toast.makeText(this, "button tapped " + taskType, Toast.LENGTH_SHORT).show();
-//        startActivity(AddTaskActivity.newIntent(this, taskType));
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
+            updateMainItemsTexts();
+        }
     }
 
     @Override
@@ -82,10 +67,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (Map.Entry<Integer, Integer> entry : MAIN_MAP.entrySet()) {
             if (view.getId() == entry.getKey()) {
                 Toast.makeText(this, "layout tapped " + entry.getValue(), Toast.LENGTH_SHORT).show();
-//                startActivity(DetailActivity.getIntent(this, entry.getValue()));
+//                startActivity(DetailActivity.newIntent(this, entry.getValue()));
                 break;
             }
         }
+    }
+
+    //region private methods
+
+    private void initMainItems() {
+        for (int i = 0; i < LAYOUT_ID_LIST.size(); i++) {
+            MAIN_ITEMS.add(new MainItem(LAYOUT_ID_LIST.get(i)));
+            MAIN_ITEMS.get(MAIN_ITEMS.size() - 1).setRootClickListener(this);
+            final int taskType = CATEGORY_TYPES.get(i);
+            MAIN_ITEMS.get(MAIN_ITEMS.size() - 1).setButtonClickListener(view -> handleButtonClick(taskType));
+        }
+        updateMainItemsTexts();
+    }
+
+    private void updateMainItemsTexts() {
+        for (int i = 0; i < MAIN_ITEMS.size(); i++) {
+            Category category = getCategoryByPrimaryKey(CATEGORY_TYPES.get(i));
+            String text = getString(CATEGORY_STRINGS.get(i)) + "\n" + getNotDoneTasksCount(category.getTasks());
+            MAIN_ITEMS.get(i).setText(text);
+        }
+    }
+
+    private void handleButtonClick(@TaskType int taskType) {
+        Toast.makeText(this, "button tapped " + taskType, Toast.LENGTH_SHORT).show();
+//        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDTaskActivity.CREATE), ADD_REQUEST_CODE);
     }
 
     private int getNotDoneTasksCount(RealmList<Task> tasks) {
@@ -98,24 +108,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return count;
     }
 
-    private Category getByPrimaryKey(int id) {
-        return mRealm.where(Category.class).equalTo("id", id).findFirst();
-    }
-
     private void initRealm() {
-        mRealm = Realm.getDefaultInstance();
         if (mRealm.allObjects(Category.class).size() > 3) {
+            Log.wtf(TAG, "initRealm: something went wrong!");
             return;
         }
-        for (int i = 0; i < CATEGORIES.size(); i++) {
+        for (int i = 0; i < CATEGORY_STRINGS.size(); i++) {
             mRealm.beginTransaction();
             Category category = new Category();
-            category.setName(getString(CATEGORIES.get(i)));
-            category.setId(TYPES.get(i));
+            category.setName(getString(CATEGORY_STRINGS.get(i)));
+            category.setId(CATEGORY_TYPES.get(i));
             mRealm.copyToRealmOrUpdate(category);
             mRealm.commitTransaction();
         }
     }
+
+    //endregion
 
     class MainItem {
         private RelativeLayout mRootLayout;

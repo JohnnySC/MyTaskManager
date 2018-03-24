@@ -1,6 +1,7 @@
 package com.github.johnnysc.mytaskmanager.model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * @author JohnnySC on 19.03.18.
@@ -8,6 +9,7 @@ import io.realm.RealmObject;
 
 public class Task extends RealmObject {
 
+    @PrimaryKey
     private String id;
     private String title;
     private String body;

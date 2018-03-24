@@ -17,9 +17,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".DetailActivity">
+        <activity android:name=".CRUDTaskActivity">
         </activity>
-        <activity android:name=".AddTaskActivity">
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/title_activity_detail"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
