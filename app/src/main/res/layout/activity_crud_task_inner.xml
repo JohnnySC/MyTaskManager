@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,27 +12,50 @@
         android:orientation="vertical"
         android:padding="@dimen/padding_medium">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:paddingBottom="@dimen/padding_small"
-            android:text="@string/category_type"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"/>
-
-        <android.support.v7.widget.AppCompatSpinner
-            android:id="@+id/spinner"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:id="@+id/date_text_view"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:paddingTop="@dimen/padding_small"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"
-            tools:text="Created on 24.03.18 14:25:40"/>
+            android:padding="@dimen/padding_small">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/spinner"
+                android:text="@string/category_type"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"/>
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_small">
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/done_check_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/done"/>
+
+            <TextView
+                android:id="@+id/date_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/done_check_box"
+                android:gravity="right"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"
+                tools:text="Created on 24.03.18 14:25:40"/>
+        </RelativeLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/title_text_input_layout"

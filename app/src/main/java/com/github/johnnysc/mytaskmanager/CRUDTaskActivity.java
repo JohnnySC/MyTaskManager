@@ -2,9 +2,10 @@ package com.github.johnnysc.mytaskmanager;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.IntDef;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.design.widget.TextInputEditText;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,6 +31,7 @@ import java.util.Date;
  */
 public class CRUDTaskActivity extends BaseActivity {
 
+    //region ActionType
     public static final int CREATE = 0;
     public static final int READ = 1;
     public static final int EDIT = 2;
@@ -38,7 +40,9 @@ public class CRUDTaskActivity extends BaseActivity {
     @IntDef({CREATE, READ, EDIT})
     public @interface TaskActionType {
     }
+    //endregion
 
+    //region fields
     private static final String EXTRA_ACTION_TYPE = "extra_action_type";
     private static final String EXTRA_TASK_ID = "extra_task_id";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
@@ -53,9 +57,13 @@ public class CRUDTaskActivity extends BaseActivity {
     private TextInputEditText mBodyEditText;
     private AppCompatSpinner mSpinner;
     private ArrayAdapter<String> mSpinnerAdapter;
+    private AppCompatCheckBox mCheckBox;
     private TextWatcher mTextWatcher;
     private String mInitialTitle;
     private String mInitialBody;
+    private boolean mCheckBoxInitialState;
+
+    //endregion
 
     public static Intent newIntent(Context context,
                                    @CategoryType.TaskType int taskType,
@@ -79,7 +87,6 @@ public class CRUDTaskActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crud_task);
         initUi();
-        // TODO: 24.03.18 add checkbox-like thing for property done
     }
 
     @Override
@@ -98,13 +105,19 @@ public class CRUDTaskActivity extends BaseActivity {
             mActionButton.setImageResource(android.R.drawable.ic_menu_edit);
             mTitleEditText.setEnabled(false);
             mBodyEditText.setEnabled(false);
-            // TODO: 24.03.18 things with focusable to change keyboard visibility
+            mTitleEditText.setFocusable(false);
+            mBodyEditText.setFocusable(false);
             mTitleEditText.setText(mInitialTitle);
             mBodyEditText.setText(mInitialBody);
+            mCheckBox.setChecked(mCheckBoxInitialState);
             mActionButton.setEnabled(true);
             // TODO: 24.03.18 hide delete item in toolbar
         } else {
-            super.onBackPressed();
+            if (mCheckBoxInitialState != mCheckBox.isChecked()) {
+                setResultOkAndFinish();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -113,6 +126,7 @@ public class CRUDTaskActivity extends BaseActivity {
         initToolbar();
         initSpinner();
         initDate();
+        initCheckBox();
         initInputs();
         initActionButton();
     }
@@ -147,6 +161,22 @@ public class CRUDTaskActivity extends BaseActivity {
         mDateTextView.setText(text);
     }
 
+    private void initCheckBox() {
+        mCheckBox = findViewById(R.id.done_check_box);
+        if (isActionTypeCreate()) {
+            mCheckBoxInitialState = false;
+        } else {
+            Task task = getTaskByPrimaryKey(mTaskId);
+            mCheckBoxInitialState = task.isDone();
+        }
+        mCheckBox.setChecked(mCheckBoxInitialState);
+        mCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if (!isActionTypeCreate()) {
+                mRealm.executeTransaction(realm -> getTaskByPrimaryKey(mTaskId).setDone(checked));
+            }
+        });
+    }
+
     private void initInputs() {
         mTitleEditText = findViewById(R.id.title_edit_text);
         mBodyEditText = findViewById(R.id.body_edit_text);
@@ -162,7 +192,8 @@ public class CRUDTaskActivity extends BaseActivity {
         mBodyEditText.setText(mInitialBody);
         mTitleEditText.setEnabled(isActionTypeCreate());
         mBodyEditText.setEnabled(isActionTypeCreate());
-        // TODO: 24.03.18 things with focusable to change keyboard visibility
+        mTitleEditText.setFocusableInTouchMode(isActionTypeCreate());
+        mBodyEditText.setFocusableInTouchMode(isActionTypeCreate());
         mTitleEditText.addTextChangedListener(mTextWatcher);
         mBodyEditText.addTextChangedListener(mTextWatcher);
     }
@@ -183,6 +214,7 @@ public class CRUDTaskActivity extends BaseActivity {
             task.setTitle(mTitleEditText.getText().toString());
             task.setBody(mBodyEditText.getText().toString());
             task.setId(new Date().getTime());
+            task.setDone(mCheckBox.isChecked());
             mRealm.executeTransaction(realm -> {
                 Category category = getCategoryByPrimaryKey(mSpinner.getSelectedItemPosition());
                 category.getTasks().add(task);
@@ -191,6 +223,8 @@ public class CRUDTaskActivity extends BaseActivity {
         } else if (mActionType == READ) {
             mTitleEditText.setEnabled(true);
             mBodyEditText.setEnabled(true);
+            mTitleEditText.setFocusableInTouchMode(true);
+            mBodyEditText.setFocusableInTouchMode(true);
             mActionType = EDIT;
             mActionButton.setImageResource(android.R.drawable.ic_menu_save);
             // TODO: 24.03.18 make delete item in menu visible
@@ -199,6 +233,8 @@ public class CRUDTaskActivity extends BaseActivity {
                 Task task = getTaskByPrimaryKey(mTaskId);
                 task.setTitle(mTitleEditText.getText().toString());
                 task.setBody(mBodyEditText.getText().toString());
+                task.setDone(mCheckBox.isChecked());
+
             });
             setResultOkAndFinish();
         }
