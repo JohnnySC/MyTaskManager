@@ -17,11 +17,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".CRUDTaskActivity">
+        <activity
+            android:name=".CRUDTaskActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Design.NoActionBar">
         </activity>
         <activity
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

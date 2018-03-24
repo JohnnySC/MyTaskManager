@@ -94,8 +94,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void handleButtonClick(@TaskType int taskType) {
-        Toast.makeText(this, "button tapped " + taskType, Toast.LENGTH_SHORT).show();
-//        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDTaskActivity.CREATE), ADD_REQUEST_CODE);
+        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDTaskActivity.CREATE), ADD_REQUEST_CODE);
     }
 
     private int getNotDoneTasksCount(RealmList<Task> tasks) {

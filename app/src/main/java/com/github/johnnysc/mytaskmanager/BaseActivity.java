@@ -36,7 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return mRealm.where(Category.class).equalTo("id", id).findFirst();
     }
 
-    protected final Task getTaskByPrimaryKey(int id) {
+    protected final Task getTaskByPrimaryKey(long id) {
         return mRealm.where(Task.class).equalTo("id", id).findFirst();
     }
 }

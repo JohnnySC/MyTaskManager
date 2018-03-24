@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey;
 public class Task extends RealmObject {
 
     @PrimaryKey
-    private String id;
+    private long id;
     private String title;
     private String body;
     private boolean done;
@@ -19,11 +19,11 @@ public class Task extends RealmObject {
         //need an empty constructor
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

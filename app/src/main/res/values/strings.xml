@@ -8,4 +8,10 @@
     <string name="edit">Редактировать</string>
     <string name="delete">Удалить</string>
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="title">Заголовок</string>
+    <string name="body">Описание</string>
+    <string name="category_type">Категория задачи</string>
+    <string name="created">Создано</string>
+    <string name="create_task">Создать задачу</string>
+    <string name="view_task">Просмотр задачи</string>
 </resources>
