@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MenuItem;
 
+import com.github.johnnysc.mytaskmanager.adapter.CustomTouchHelperCallback;
 import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
 import com.github.johnnysc.mytaskmanager.adapter.TaskInteractListener;
 import com.github.johnnysc.mytaskmanager.model.CategoryType;
@@ -14,7 +15,6 @@ import com.github.johnnysc.mytaskmanager.model.Task;
 
 import java.util.Collections;
 
-import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -23,7 +23,7 @@ import io.realm.RealmResults;
  * it is possible to make the task done immediately from list
  * view details and add a new one
  */
-public class DetailActivity extends BaseActivity implements TaskInteractListener {
+public class DetailActivity extends BaseActivity implements TaskInteractListener, CustomTouchHelperCallback.TouchHelperInteractionListener {
 
     private static final int REQUEST_CODE = 2;
     private TaskAdapter mAdapter;
@@ -88,6 +88,31 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
                 startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDTaskActivity.CREATE), REQUEST_CODE));
     }
 
+    @Override
+    public void onMove(int oldPosition, int newPosition) {
+        mRealm.executeTransaction(realm -> getCategoryByPrimaryKey(mTaskType).getTasks().move(oldPosition, newPosition));
+        mAdapter.notifyItemMoved(oldPosition, newPosition);
+    }
+
+    @Override
+    public void onSwiped(int position) {
+        boolean needUpdate;
+        long id = getCategoryByPrimaryKey(mTaskType).getTasks().get(position).getId();
+        needUpdate = getTaskByPrimaryKey(id).isDone();
+        if (!needUpdate) {
+            mAdapter.notifyDataSetChanged();
+            return;
+        }
+        mRealm.executeTransaction(realm -> {
+            RealmResults<Task> rows = realm.where(Task.class).equalTo("id", id).findAll();
+            rows.clear();
+        });
+        mAdapter.notifyDataSetChanged();
+        mDataChanged = true;
+    }
+
+    //region private methods
+
     private void updateData() {
         sortData();
         mAdapter.notifyDataSetChanged();
@@ -122,48 +147,11 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(mAdapter);
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                int old = viewHolder.getAdapterPosition();
-                int tgt = target.getAdapterPosition();
-                mRealm.executeTransaction(realm -> getCategoryByPrimaryKey(mTaskType).getTasks().move(old, tgt));
-                mAdapter.notifyItemMoved(old, tgt);
-                return true;
-            }
-
-            @Override
-            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-                return makeMovementFlags(dragFlags, ItemTouchHelper.LEFT);
-            }
-
-            @Override
-            public boolean isItemViewSwipeEnabled() {
-                return true;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                if (direction != ItemTouchHelper.LEFT) {
-                    return;
-                }
-                boolean needUpdate;
-                long id = getCategoryByPrimaryKey(mTaskType).getTasks().get(viewHolder.getLayoutPosition()).getId();
-                needUpdate = getTaskByPrimaryKey(id).isDone();
-                if (!needUpdate) {
-                    mAdapter.notifyDataSetChanged();
-                    return;
-                }
-                mRealm.executeTransaction(realm -> {
-                    RealmResults<Task> rows = realm.where(Task.class).equalTo("id", id).findAll();
-                    rows.clear();
-                });
-                mAdapter.notifyDataSetChanged();
-                mDataChanged = true;
-            }
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        CustomTouchHelperCallback itemTouchCallback = new CustomTouchHelperCallback(0, ItemTouchHelper.LEFT, this);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
+
+    //endregion
+
 }
