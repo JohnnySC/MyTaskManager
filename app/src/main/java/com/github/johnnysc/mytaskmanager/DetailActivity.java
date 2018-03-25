@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MenuItem;
 
 import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
@@ -14,6 +15,7 @@ import com.github.johnnysc.mytaskmanager.model.Task;
 import java.util.Collections;
 
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
 /**
  * Here is the list of all the task of chosen category
@@ -119,5 +121,33 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(mAdapter);
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                if (direction != ItemTouchHelper.LEFT) {
+                    return;
+                }
+                boolean needUpdate;
+                long id = getCategoryByPrimaryKey(mTaskType).getTasks().get(viewHolder.getLayoutPosition()).getId();
+                needUpdate = getTaskByPrimaryKey(id).isDone();
+                if (!needUpdate) {
+                    mAdapter.notifyDataSetChanged();
+                    return;
+                }
+                mRealm.executeTransaction(realm -> {
+                    RealmResults<Task> rows = realm.where(Task.class).equalTo("id", id).findAll();
+                    rows.clear();
+                });
+                mAdapter.notifyDataSetChanged();
+                mDataChanged = true;
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 }

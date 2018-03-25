@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/check_box"
+        android:background="?attr/selectableItemBackground"
         android:orientation="vertical"
         android:padding="@dimen/padding_small">
 
@@ -24,12 +25,17 @@
 
         <TextView
             android:id="@+id/body_text_view"
-            android:singleLine="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/padding_small"
+            android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             tools:text="Body"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"/>
 
     </LinearLayout>
 
