@@ -20,6 +20,7 @@ public final class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
 
     private final TaskInteractListener mTaskInteractListener;
     private RealmList<Task> mTasks;
+    private boolean mOnBind;
 
     public TaskAdapter(TaskInteractListener taskCheckListener,
                        RealmList<Task> tasks) {
@@ -36,7 +37,9 @@ public final class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
         Task task = mTasks.get(position);
+        mOnBind = true;
         holder.setCheckBoxChecked(task.isDone());
+        mOnBind = false;
         if (task.isDone()) {
             holder.setDataStrikeThrough();
         }
@@ -46,7 +49,9 @@ public final class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
             } else {
                 holder.setDataCleared();
             }
-            mTaskInteractListener.setTaskDone(task.getId(), checked);
+            if (!mOnBind) {
+                mTaskInteractListener.setTaskDone(task.getId(), checked);
+            }
         });
         holder.setTitle(task.getTitle());
         holder.setBody(task.getBody());

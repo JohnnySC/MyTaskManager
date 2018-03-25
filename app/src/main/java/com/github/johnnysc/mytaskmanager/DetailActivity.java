@@ -9,6 +9,11 @@ import android.view.MenuItem;
 import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
 import com.github.johnnysc.mytaskmanager.adapter.TaskInteractListener;
 import com.github.johnnysc.mytaskmanager.model.CategoryType;
+import com.github.johnnysc.mytaskmanager.model.Task;
+
+import java.util.Collections;
+
+import io.realm.RealmList;
 
 /**
  * Here is the list of all the task of chosen category
@@ -48,8 +53,7 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_CODE == requestCode && resultCode == RESULT_OK) {
-            mAdapter.notifyDataSetChanged();
-            mDataChanged = true;
+            updateData();
         }
     }
 
@@ -65,7 +69,7 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
     @Override
     public void setTaskDone(long id, boolean done) {
         mRealm.executeTransaction(realm -> getTaskByPrimaryKey(id).setDone(done));
-        mDataChanged = true;
+        updateData();
     }
 
     @Override
@@ -81,8 +85,23 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
                 startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDTaskActivity.CREATE), REQUEST_CODE));
     }
 
+    private void updateData() {
+        sortData();
+        mAdapter.notifyDataSetChanged();
+        mDataChanged = true;
+    }
+
     private void initAdapter() {
         mAdapter = new TaskAdapter(this, getCategoryByPrimaryKey(mTaskType).getTasks());
+    }
+
+    private void sortData() {
+        RealmList<Task> list = getCategoryByPrimaryKey(mTaskType).getTasks();
+        mRealm.executeTransaction(realm -> Collections.sort(list, (task, that) -> {
+            int taskInt = task.isDone() ? 2 : 1;
+            int thatInt = that.isDone() ? 2 : 1;
+            return taskInt - thatInt;
+        }));
     }
 
     private void initUi() {
