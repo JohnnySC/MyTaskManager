@@ -55,7 +55,7 @@ final class TaskViewHolder extends RecyclerView.ViewHolder {
     }
 
     void setDataCleared() {
-        mTitle.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
-        mBody.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
+        mTitle.setPaintFlags(mTitle.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+        mBody.setPaintFlags(mBody.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
     }
 }

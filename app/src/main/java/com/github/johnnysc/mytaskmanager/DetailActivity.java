@@ -14,6 +14,7 @@ import com.github.johnnysc.mytaskmanager.model.Task;
 
 import java.util.Collections;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -124,7 +125,22 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
+                int old = viewHolder.getAdapterPosition();
+                int tgt = target.getAdapterPosition();
+                mRealm.executeTransaction(realm -> getCategoryByPrimaryKey(mTaskType).getTasks().move(old, tgt));
+                mAdapter.notifyItemMoved(old, tgt);
+                return true;
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+                return makeMovementFlags(dragFlags, ItemTouchHelper.LEFT);
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return true;
             }
 
             @Override

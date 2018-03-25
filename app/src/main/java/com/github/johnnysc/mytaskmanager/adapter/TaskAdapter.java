@@ -55,9 +55,7 @@ public final class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
         });
         holder.setTitle(task.getTitle());
         holder.setBody(task.getBody());
-        holder.setLayoutClickListener(view -> {
-            mTaskInteractListener.viewTask(task.getId());
-        });
+        holder.setLayoutClickListener(view -> mTaskInteractListener.viewTask(task.getId()));
     }
 
     @Override
