@@ -1,6 +1,7 @@
 package com.github.johnnysc.mytaskmanager;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -87,8 +88,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void updateMainItemsTexts() {
         for (int i = 0; i < MAIN_ITEMS.size(); i++) {
             Category category = getCategoryByPrimaryKey(CATEGORY_TYPES.get(i));
-            String text = getString(CATEGORY_STRINGS.get(i)) + "\n" + getNotDoneTasksCount(category.getTasks());
+            int notDoneTasksCount = getNotDoneTasksCount(category.getTasks());
+            String text = getString(CATEGORY_STRINGS.get(i)) + "\n" + notDoneTasksCount;
             MAIN_ITEMS.get(i).setText(text);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (notDoneTasksCount >= 3) {
+                    MAIN_ITEMS.get(i).setTextColor(getResources().getColor(android.R.color.holo_red_dark, null));
+                } else {
+                    MAIN_ITEMS.get(i).setTextColor(getResources().getColor(android.R.color.widget_edittext_dark, null));
+                }
+            }
         }
     }
 
@@ -136,6 +145,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         void setText(String text) {
             mInfoTextView.setText(text);
+        }
+
+        void setTextColor(int hex) {
+            mInfoTextView.setTextColor(hex);
         }
 
         void setButtonClickListener(View.OnClickListener listener) {
