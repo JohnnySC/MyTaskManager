@@ -57,6 +57,29 @@
                 tools:text="Created on 24.03.18 14:25:40"/>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_small">
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/alarm_check_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alarm"/>
+
+            <TextView
+                android:id="@+id/time_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/alarm_check_box"
+                android:gravity="right"
+                android:paddingLeft="@dimen/padding_small"
+                android:text="@string/choose_date"/>
+        </RelativeLayout>
+
         <android.support.design.widget.TextInputLayout
             android:id="@+id/title_text_input_layout"
             android:layout_width="match_parent"

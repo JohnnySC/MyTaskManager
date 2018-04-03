@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.github.johnnysc.mytaskmanager">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".MyTaskApplication"
         android:allowBackup="true"
@@ -29,6 +32,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+        <receiver
+            android:name=".notifications.TaskBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false"/>
+
+        <service android:name=".notifications.NotificationActionService"/>
     </application>
 
 </manifest>

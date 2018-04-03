@@ -15,4 +15,6 @@
     <string name="create_task">Создать задачу</string>
     <string name="view_task">Просмотр задачи</string>
     <string name="done">Готово</string>
+    <string name="alarm">Оповестить</string>
+    <string name="choose_date">Дата и время оповещеня</string>
 </resources>

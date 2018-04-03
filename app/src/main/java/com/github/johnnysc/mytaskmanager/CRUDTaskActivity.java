@@ -1,5 +1,8 @@
 package com.github.johnnysc.mytaskmanager;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,15 +16,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.github.johnnysc.mytaskmanager.model.Category;
 import com.github.johnnysc.mytaskmanager.model.CategoryType;
 import com.github.johnnysc.mytaskmanager.model.Task;
+import com.github.johnnysc.mytaskmanager.notifications.NotificationActionService;
+import com.github.johnnysc.mytaskmanager.notifications.TaskBroadcastReceiver;
+import com.github.johnnysc.mytaskmanager.utils.DateTimeUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,7 +40,7 @@ import io.realm.RealmResults;
  * and action type {@link TaskActionType} to define is it new or existing task
  * Depending on that, need to show or hide extra actions like delete & modify
  */
-public class CRUDTaskActivity extends BaseActivity {
+public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback, TimePickerCallback {
 
     //region ActionType
     public static final int CREATE = 0;
@@ -43,6 +50,7 @@ public class CRUDTaskActivity extends BaseActivity {
     private static final String EXTRA_ACTION_TYPE = "extra_action_type";
     //endregion
     private static final String EXTRA_TASK_ID = "extra_task_id";
+    private static final String SHOW_TASK_ACTION = "Show task";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final int INPUT_MIN_LENGTH = 4;
     @TaskActionType
@@ -53,12 +61,18 @@ public class CRUDTaskActivity extends BaseActivity {
     private TextInputEditText mBodyEditText;
     private AppCompatSpinner mSpinner;
     private ArrayAdapter<String> mSpinnerAdapter;
-    private AppCompatCheckBox mCheckBox;
+    private AppCompatCheckBox mDoneCheckBox;
+    private TextView mTimeTextView;
+    private AppCompatCheckBox mNotifyCheckBox;
     private TextWatcher mTextWatcher;
     private String mInitialTitle;
     private String mInitialBody;
+    private String mInitialTime;
     private boolean mCheckBoxInitialState;
     private MenuItem mDeleteMenuItem;
+    private Date mNotifyDate = new Date(0);
+    private DatePicker mDatePicker;
+    private final java.text.DateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 
     public static Intent newIntent(Context context,
                                    @CategoryType.TaskType int taskType,
@@ -120,11 +134,13 @@ public class CRUDTaskActivity extends BaseActivity {
             mBodyEditText.setFocusable(false);
             mTitleEditText.setText(mInitialTitle);
             mBodyEditText.setText(mInitialBody);
-            mCheckBox.setChecked(mCheckBoxInitialState);
+            mDoneCheckBox.setChecked(mCheckBoxInitialState);
+            mNotifyCheckBox.setChecked(false);
+            mTimeTextView.setText(mInitialTime);
             mActionButton.setEnabled(true);
             mDeleteMenuItem.setVisible(false);
         } else {
-            if (mCheckBoxInitialState != mCheckBox.isChecked()) {
+            if (mCheckBoxInitialState != mDoneCheckBox.isChecked()) {
                 setResultOkAndFinish();
             } else {
                 super.onBackPressed();
@@ -132,17 +148,40 @@ public class CRUDTaskActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void doOnDatePicked(DatePicker view, int year, int month, int day) {
+        mDatePicker = view;
+        TimePickerFragment newFragment = TimePickerFragment.newInstance();
+        newFragment.setTimePickerCallback(this);
+        newFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    @Override
+    public void doOnTimePicked(TimePicker view, int hourOfDay, int minute) {
+        mNotifyDate = DateTimeUtils.getDateFromDatePicker(mDatePicker, view);
+        mTimeTextView.setText(SIMPLE_DATE_FORMAT.format(mNotifyDate));
+    }
+
+    //endregion
+
+    protected void initExtraData() {
+        super.initExtraData();
+        mActionType = getIntent().getIntExtra(EXTRA_ACTION_TYPE, 0);
+        mTaskId = getIntent().getLongExtra(EXTRA_TASK_ID, -1L);
+    }
+
+    //region private methods
+
     private void initUi() {
         initTitle();
         initToolbar();
         initSpinner();
         initDate();
         initCheckBox();
+        initNotifyItems();
         initInputs();
         initActionButton();
     }
-
-    //endregion
 
     private void initTitle() {
         setTitle(isActionTypeCreate() ? R.string.create_task : R.string.view_task);
@@ -157,7 +196,7 @@ public class CRUDTaskActivity extends BaseActivity {
     }
 
     private void initSpinnerAdapter() {
-        String[] data = new String[4];
+        final String[] data = new String[4];
         for (int i = 0; i < CATEGORY_STRINGS.size(); i++) {
             data[i] = getString(CATEGORY_STRINGS.get(i));
         }
@@ -166,28 +205,50 @@ public class CRUDTaskActivity extends BaseActivity {
 
     private void initDate() {
         mDateTextView = findViewById(R.id.date_text_view);
-        DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         Date date = isActionTypeCreate()
                 ? new Date()
                 : new Date(getTaskByPrimaryKey(mTaskId).getId());
-        String text = getString(R.string.created) + " " + dateFormat.format(date);
+        String text = getString(R.string.created) + " " + SIMPLE_DATE_FORMAT.format(date);
         mDateTextView.setText(text);
     }
 
     private void initCheckBox() {
-        mCheckBox = findViewById(R.id.done_check_box);
+        mDoneCheckBox = findViewById(R.id.done_check_box);
         if (isActionTypeCreate()) {
             mCheckBoxInitialState = false;
         } else {
             Task task = getTaskByPrimaryKey(mTaskId);
             mCheckBoxInitialState = task.isDone();
         }
-        mCheckBox.setChecked(mCheckBoxInitialState);
-        mCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
+        mDoneCheckBox.setChecked(mCheckBoxInitialState);
+        mDoneCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
             if (!isActionTypeCreate()) {
                 mRealm.executeTransaction(realm -> getTaskByPrimaryKey(mTaskId).setDone(checked));
             }
         });
+    }
+
+    private void initNotifyItems() {
+        mTimeTextView = findViewById(R.id.time_text_view);
+        mNotifyCheckBox = findViewById(R.id.alarm_check_box);
+        mTimeTextView.setOnClickListener(v -> {
+            DatePickerFragment newFragment = DatePickerFragment.newInstance();
+            newFragment.setCallback(this);
+            newFragment.show(getSupportFragmentManager(), "datePicker");
+        });
+        mInitialTime = getString(R.string.choose_date);
+        if (!isActionTypeCreate()) {
+            Task task = getTaskByPrimaryKey(mTaskId);
+            long deadLine = task.getDeadline();
+            Date date = new Date(deadLine);
+            if (deadLine > 0) {
+                mNotifyCheckBox.setChecked(task.isNotify());
+                mInitialTime = SIMPLE_DATE_FORMAT.format(date);
+                mTimeTextView.setText(mInitialTime);
+            }
+        }
+        mTimeTextView.setClickable(isActionTypeCreate());
+        mNotifyCheckBox.setEnabled(isActionTypeCreate());
     }
 
     private void initInputs() {
@@ -223,12 +284,18 @@ public class CRUDTaskActivity extends BaseActivity {
 
     private void handleActionButtonClick() {
         if (isActionTypeCreate()) {
-            Task task = new Task();
-            task.setTitle(mTitleEditText.getText().toString());
-            task.setBody(mBodyEditText.getText().toString());
-            task.setId(new Date().getTime());
-            task.setDone(mCheckBox.isChecked());
             mRealm.executeTransaction(realm -> {
+                Task task = new Task();
+                task.setTitle(mTitleEditText.getText().toString());
+                task.setBody(mBodyEditText.getText().toString());
+                mTaskId = new Date().getTime();
+                task.setId(mTaskId);
+                task.setDone(mDoneCheckBox.isChecked());
+                boolean checked = mNotifyCheckBox.isChecked();
+                task.setNotify(checked);
+                if (checked) {
+                    task.setDeadline(mNotifyDate.getTime());
+                }
                 Category category = getCategoryByPrimaryKey(mSpinner.getSelectedItemPosition());
                 category.getTasks().add(task);
             });
@@ -241,13 +308,19 @@ public class CRUDTaskActivity extends BaseActivity {
             mActionType = EDIT;
             mActionButton.setImageResource(android.R.drawable.ic_menu_save);
             mDeleteMenuItem.setVisible(true);
+            mNotifyCheckBox.setEnabled(true);
+            mTimeTextView.setClickable(true);
         } else {
             mRealm.executeTransaction(realm -> {
                 Task task = getTaskByPrimaryKey(mTaskId);
                 task.setTitle(mTitleEditText.getText().toString());
                 task.setBody(mBodyEditText.getText().toString());
-                task.setDone(mCheckBox.isChecked());
-
+                task.setDone(mDoneCheckBox.isChecked());
+                boolean checked = mNotifyCheckBox.isChecked();
+                task.setNotify(checked);
+                if (checked) {
+                    task.setDeadline(mNotifyDate.getTime());
+                }
             });
             setResultOkAndFinish();
         }
@@ -258,13 +331,48 @@ public class CRUDTaskActivity extends BaseActivity {
             RealmResults<Task> rows = realm.where(Task.class).equalTo("id", mTaskId).findAll();
             rows.clear();
         });
+        mNotifyCheckBox.setChecked(false);
         setResultOkAndFinish();
     }
 
     private void setResultOkAndFinish() {
+        sendNotification();
         Intent intent = new Intent();
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    private void sendNotification() {
+        if (mNotifyCheckBox.isChecked()) {
+            scheduleNotification(getNotification());
+        }
+    }
+
+    private void scheduleNotification(Notification notification) {
+        int id = (int) mTaskId;
+        Intent notificationIntent = TaskBroadcastReceiver.newIntent(this, id, notification);
+        notificationIntent.setAction(String.valueOf(id)); //needs to show different notifications
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        long futureInMillis = mNotifyDate.getTime();
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, futureInMillis, pendingIntent);
+        }
+    }
+
+    private Notification getNotification() {
+        Intent actionIntent = NotificationActionService.newIntent(this, mTaskId, mTaskType, SHOW_TASK_ACTION);
+        actionIntent.setAction(String.valueOf(mTaskId)); //needs to show different notifications
+        PendingIntent actionPendingIntent = PendingIntent.getService(this, 0, actionIntent, PendingIntent.FLAG_ONE_SHOT);
+        return new Notification.Builder(this)
+                .setContentTitle(mTitleEditText.getText().toString())
+                .setContentText(mBodyEditText.getText().toString())
+                .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                .addAction(android.R.drawable.ic_dialog_info, SHOW_TASK_ACTION, actionPendingIntent)
+                .setContentIntent(actionPendingIntent)
+                .setAutoCancel(true)
+                .build();
     }
 
     private void updateActionButtonVisibility() {
@@ -280,11 +388,7 @@ public class CRUDTaskActivity extends BaseActivity {
         return mActionType == CREATE;
     }
 
-    protected void initExtraData() {
-        super.initExtraData();
-        mActionType = getIntent().getIntExtra(EXTRA_ACTION_TYPE, 0);
-        mTaskId = getIntent().getLongExtra(EXTRA_TASK_ID, -1L);
-    }
+    //endregion
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({CREATE, READ, EDIT})

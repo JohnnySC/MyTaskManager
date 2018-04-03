@@ -32,7 +32,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final int REQUEST_CODE = 1;
 
     private static final Map<Integer, Integer> MAIN_MAP = new HashMap<>();
-    private static final List<MainActivity.MainItem> MAIN_ITEMS = new ArrayList<>();
     private static final List<Integer> LAYOUT_ID_LIST = Arrays.asList(
             R.id.first_category_layout,
             R.id.second_category_layout,
@@ -45,6 +44,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             MAIN_MAP.put(LAYOUT_ID_LIST.get(i), CATEGORY_TYPES.get(i));
         }
     }
+    private List<MainActivity.MainItem> mMainItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,20 +75,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     //region private methods
 
     private void initMainItems() {
+        mMainItems = new ArrayList<>();
         for (int i = 0; i < LAYOUT_ID_LIST.size(); i++) {
-            MAIN_ITEMS.add(new MainItem(LAYOUT_ID_LIST.get(i)));
-            MAIN_ITEMS.get(MAIN_ITEMS.size() - 1).setRootClickListener(this);
+            mMainItems.add(new MainItem(LAYOUT_ID_LIST.get(i)));
+            mMainItems.get(mMainItems.size() - 1).setRootClickListener(this);
             final int taskType = CATEGORY_TYPES.get(i);
-            MAIN_ITEMS.get(MAIN_ITEMS.size() - 1).setButtonClickListener(view -> handleButtonClick(taskType));
+            mMainItems.get(mMainItems.size() - 1).setButtonClickListener(view -> handleButtonClick(taskType));
         }
         updateMainItemsTexts();
     }
 
     private void updateMainItemsTexts() {
-        for (int i = 0; i < MAIN_ITEMS.size(); i++) {
+        for (int i = 0; i < mMainItems.size(); i++) {
             Category category = getCategoryByPrimaryKey(CATEGORY_TYPES.get(i));
             String text = getString(CATEGORY_STRINGS.get(i)) + "\n" + getNotDoneTasksCount(category.getTasks());
-            MAIN_ITEMS.get(i).setText(text);
+            mMainItems.get(i).setText(text);
         }
     }
 

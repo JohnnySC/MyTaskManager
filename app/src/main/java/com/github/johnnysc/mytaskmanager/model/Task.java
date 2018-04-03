@@ -14,6 +14,8 @@ public class Task extends RealmObject {
     private String title;
     private String body;
     private boolean done;
+    private long deadline;
+    private boolean notify;
 
     public Task() {
         //need an empty constructor
@@ -49,5 +51,21 @@ public class Task extends RealmObject {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public long getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(long deadline) {
+        this.deadline = deadline;
+    }
+
+    public boolean isNotify() {
+        return notify;
+    }
+
+    public void setNotify(boolean notify) {
+        this.notify = notify;
     }
 }
