@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyTaskManager</string>
+    <string name="app_name">My Tasks</string>
     <string name="first_category">Несрочно и неважно</string>
     <string name="second_category">Несрочно, но важно</string>
     <string name="third_category">Срочно, но неважно</string>
