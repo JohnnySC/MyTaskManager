@@ -1,7 +1,8 @@
-package com.github.johnnysc.mytaskmanager;
+package com.github.johnnysc.mytaskmanager.dateandtime;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -23,8 +24,16 @@ public class DatePickerFragment extends DialogFragment
         return new DatePickerFragment();
     }
 
-    public void setCallback(DatePickerCallback callback) {
-        mCallback = callback;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (DatePickerCallback) getActivity();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
     }
 
     @NonNull
@@ -42,7 +51,7 @@ public class DatePickerFragment extends DialogFragment
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
         // Do something with the date chosen by the user
-        if (view.isShown()) {
+        if (view.isShown() && mCallback != null) {
             mCallback.doOnDatePicked(view, year, month, day);
         }
     }

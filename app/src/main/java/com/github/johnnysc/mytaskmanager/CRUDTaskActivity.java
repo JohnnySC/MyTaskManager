@@ -20,6 +20,10 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerCallback;
+import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerFragment;
+import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerCallback;
+import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerFragment;
 import com.github.johnnysc.mytaskmanager.model.Category;
 import com.github.johnnysc.mytaskmanager.model.CategoryType;
 import com.github.johnnysc.mytaskmanager.model.Task;
@@ -152,7 +156,6 @@ public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback
     public void doOnDatePicked(DatePicker view, int year, int month, int day) {
         mDatePicker = view;
         TimePickerFragment newFragment = TimePickerFragment.newInstance();
-        newFragment.setTimePickerCallback(this);
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
@@ -233,7 +236,6 @@ public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback
         mNotifyCheckBox = findViewById(R.id.alarm_check_box);
         mTimeTextView.setOnClickListener(v -> {
             DatePickerFragment newFragment = DatePickerFragment.newInstance();
-            newFragment.setCallback(this);
             newFragment.show(getSupportFragmentManager(), "datePicker");
         });
         mInitialTime = getString(R.string.choose_date);

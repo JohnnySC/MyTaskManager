@@ -1,7 +1,8 @@
-package com.github.johnnysc.mytaskmanager;
+package com.github.johnnysc.mytaskmanager.dateandtime;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -25,8 +26,16 @@ public class TimePickerFragment extends DialogFragment
         return new TimePickerFragment();
     }
 
-    public void setTimePickerCallback(TimePickerCallback timePickerCallback) {
-        mTimePickerCallback = timePickerCallback;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mTimePickerCallback = (TimePickerCallback) getActivity();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mTimePickerCallback = null;
     }
 
     @NonNull
@@ -44,7 +53,7 @@ public class TimePickerFragment extends DialogFragment
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
-        if (view.isShown()) {
+        if (view.isShown() && mTimePickerCallback != null) {
             mTimePickerCallback.doOnTimePicked(view, hourOfDay, minute);
         }
     }
