@@ -2,6 +2,8 @@ package com.github.johnnysc.mytaskmanager;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -385,6 +387,8 @@ public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback
                 .addAction(android.R.drawable.ic_dialog_info, SHOW_TASK_ACTION, actionPendingIntent)
                 .setContentIntent(actionPendingIntent)
                 .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(Notification.PRIORITY_HIGH)
                 .build();
     }
 
