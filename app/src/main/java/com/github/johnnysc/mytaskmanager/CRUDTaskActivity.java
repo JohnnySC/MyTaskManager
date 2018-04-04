@@ -344,19 +344,32 @@ public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback
 
     private void sendNotification() {
         if (mNotifyCheckBox.isChecked()) {
-            scheduleNotification(getNotification());
+            scheduleNotification();
+        } else {
+            cancelNotification();
         }
     }
 
-    private void scheduleNotification(Notification notification) {
+    private void scheduleNotification() {
+        sendNotification(false);
+    }
+
+    private void cancelNotification() {
+        sendNotification(true);
+    }
+
+    private void sendNotification(boolean cancel) {
         int id = (int) mTaskId;
-        Intent notificationIntent = TaskBroadcastReceiver.newIntent(this, id, notification);
+        Intent notificationIntent = TaskBroadcastReceiver.newIntent(this, id, getNotification(), cancel);
         notificationIntent.setAction(String.valueOf(id)); //needs to show different notifications
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
         long futureInMillis = mNotifyDate.getTime();
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager != null) {
+        if (alarmManager == null) return;
+        if (cancel) {
+            alarmManager.cancel(pendingIntent);
+        } else {
             alarmManager.set(AlarmManager.RTC_WAKEUP, futureInMillis, pendingIntent);
         }
     }

@@ -15,15 +15,18 @@ import android.os.Bundle;
 
 public class TaskBroadcastReceiver extends BroadcastReceiver {
 
-    public static final String EXTRA_NOTIFICATION_ID = "extra_id";
-    public static final String EXTRA_NOTIFICATION_ITEM = "extra_item";
+    private static final String EXTRA_NOTIFICATION_ID = "extra_id";
+    private static final String EXTRA_NOTIFICATION_ITEM = "extra_item";
+    private static final String EXTRA_CANCEL = "extra_cancel";
 
     public static Intent newIntent(Context context,
                                    final int id,
-                                   final Notification notification) {
+                                   final Notification notification,
+                                   boolean cancel) {
         Intent intent = new Intent(context, TaskBroadcastReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_ID, id);
         intent.putExtra(EXTRA_NOTIFICATION_ITEM, notification);
+        intent.putExtra(EXTRA_CANCEL, cancel);
         return intent;
     }
 
@@ -34,6 +37,11 @@ public class TaskBroadcastReceiver extends BroadcastReceiver {
         if (extras == null || manager == null) return;
         Notification notification = extras.getParcelable(EXTRA_NOTIFICATION_ITEM);
         int id = extras.getInt(EXTRA_NOTIFICATION_ID);
-        manager.notify(id, notification);
+        boolean cancel = extras.getBoolean(EXTRA_CANCEL);
+        if (cancel) {
+            manager.cancel(id);
+        } else {
+            manager.notify(id, notification);
+        }
     }
 }
