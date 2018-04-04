@@ -54,7 +54,6 @@ public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback
     private static final String EXTRA_ACTION_TYPE = "extra_action_type";
     //endregion
     private static final String EXTRA_TASK_ID = "extra_task_id";
-    private static final String SHOW_TASK_ACTION = "Show task";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final int INPUT_MIN_LENGTH = 4;
     @TaskActionType
@@ -377,14 +376,13 @@ public class CRUDTaskActivity extends BaseActivity implements DatePickerCallback
     }
 
     private Notification getNotification() {
-        Intent actionIntent = NotificationActionService.newIntent(this, mTaskId, mTaskType, SHOW_TASK_ACTION);
+        Intent actionIntent = NotificationActionService.newIntent(this, mTaskId, mTaskType);
         actionIntent.setAction(String.valueOf(mTaskId)); //needs to show different notifications
         PendingIntent actionPendingIntent = PendingIntent.getService(this, 0, actionIntent, PendingIntent.FLAG_ONE_SHOT);
         return new Notification.Builder(this)
                 .setContentTitle(mTitleEditText.getText().toString())
                 .setContentText(mBodyEditText.getText().toString())
-                .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                .addAction(android.R.drawable.ic_dialog_info, SHOW_TASK_ACTION, actionPendingIntent)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentIntent(actionPendingIntent)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)

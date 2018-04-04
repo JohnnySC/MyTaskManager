@@ -23,12 +23,10 @@ public class NotificationActionService extends IntentService {
 
     public static Intent newIntent(Context context,
                                    final long taskId,
-                                   final @CategoryType.TaskType int taskType,
-                                   final String action) {
+                                   final @CategoryType.TaskType int taskType) {
         Intent intent = new Intent(context, NotificationActionService.class);
         intent.putExtra(EXTRA_TASK_ID, taskId);
         intent.putExtra(EXTRA_TASK_TYPE, taskType);
-        intent.setAction(action);
         return intent;
     }
 
