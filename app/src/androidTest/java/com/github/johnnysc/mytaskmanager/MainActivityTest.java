@@ -67,7 +67,7 @@ public class MainActivityTest extends BaseTest {
      */
     @Test
     public void testSaveEditAndDelete() {
-        for (int i = 0; i < mCategoriesLayout.size(); i++) {
+        for (int i = 0; i < 1; i++) {
             createAndEditTask(i);
             // 3. delete task
             onView(withId(R.id.data_layout)).perform(swipeLeft());
@@ -86,6 +86,26 @@ public class MainActivityTest extends BaseTest {
             pressBack(false);
             checkMainText(i, 0);
         }
+    }
+
+    @Test
+    public void testCancelEdit() {
+        createAndEditTask(1);
+        onView(withId(R.id.data_layout)).perform(click());
+        checkFabImage(android.R.drawable.ic_menu_edit);
+        onView(withId(R.id.action_fab)).perform(click());
+        checkFabImage(android.R.drawable.ic_menu_save);
+        onView(withId(R.id.title_edit_text)).perform(scrollTo(), typeText(TEXT_TO_BE_TYPED));
+        onView(withId(R.id.body_edit_text)).perform(scrollTo(), typeText(TEXT_TO_BE_TYPED));
+        // TODO: 05.04.18 add some special logic later
+        pressBack(true);
+        pressBack(true);
+        checkFabImage(android.R.drawable.ic_menu_edit);
+        onView(withId(R.id.title_edit_text)).perform(scrollTo()).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
+        onView(withId(R.id.body_edit_text)).perform(scrollTo()).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
+        pressBack(true);
+        onView(withId(R.id.title_text_view)).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
+        onView(withId(R.id.body_text_view)).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
     }
 
     private void createAndEditTask(int layoutIndex) {
