@@ -8,8 +8,8 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.github.johnnysc.mytaskmanager.model.Category;
-import com.github.johnnysc.mytaskmanager.model.Task;
+import com.github.johnnysc.mytaskmanager.bean.Category;
+import com.github.johnnysc.mytaskmanager.bean.Task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +19,8 @@ import java.util.Map;
 
 import io.realm.RealmList;
 
-import static com.github.johnnysc.mytaskmanager.model.CategoryType.CATEGORY_TYPES;
-import static com.github.johnnysc.mytaskmanager.model.CategoryType.TaskType;
+import static com.github.johnnysc.mytaskmanager.bean.CategoryType.CATEGORY_TYPES;
+import static com.github.johnnysc.mytaskmanager.bean.CategoryType.TaskType;
 
 /**
  * Contains 4 categories equal parts on screen and buttons on them,

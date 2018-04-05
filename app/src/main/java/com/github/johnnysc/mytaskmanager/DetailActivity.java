@@ -10,8 +10,8 @@ import android.view.MenuItem;
 import com.github.johnnysc.mytaskmanager.adapter.CustomTouchHelperCallback;
 import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
 import com.github.johnnysc.mytaskmanager.adapter.TaskInteractListener;
-import com.github.johnnysc.mytaskmanager.model.CategoryType;
-import com.github.johnnysc.mytaskmanager.model.Task;
+import com.github.johnnysc.mytaskmanager.bean.CategoryType;
+import com.github.johnnysc.mytaskmanager.bean.Task;
 
 import java.util.Collections;
 

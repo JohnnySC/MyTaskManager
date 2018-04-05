@@ -1,4 +1,4 @@
-package com.github.johnnysc.mytaskmanager.model;
+package com.github.johnnysc.mytaskmanager.bean;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

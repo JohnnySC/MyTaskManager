@@ -20,13 +20,13 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.github.johnnysc.mytaskmanager.bean.Category;
+import com.github.johnnysc.mytaskmanager.bean.CategoryType;
+import com.github.johnnysc.mytaskmanager.bean.Task;
 import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerCallback;
 import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerFragment;
 import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerCallback;
 import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerFragment;
-import com.github.johnnysc.mytaskmanager.model.Category;
-import com.github.johnnysc.mytaskmanager.model.CategoryType;
-import com.github.johnnysc.mytaskmanager.model.Task;
 import com.github.johnnysc.mytaskmanager.notifications.NotificationActionService;
 import com.github.johnnysc.mytaskmanager.notifications.TaskBroadcastReceiver;
 import com.github.johnnysc.mytaskmanager.utils.DateTimeUtils;

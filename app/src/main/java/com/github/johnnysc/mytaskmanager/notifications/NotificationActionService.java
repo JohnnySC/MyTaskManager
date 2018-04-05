@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.github.johnnysc.mytaskmanager.CRUDTaskActivity;
-import com.github.johnnysc.mytaskmanager.model.CategoryType;
+import com.github.johnnysc.mytaskmanager.bean.CategoryType;
 
 import static com.github.johnnysc.mytaskmanager.CRUDTaskActivity.READ;
 

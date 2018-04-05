@@ -1,4 +1,4 @@
-package com.github.johnnysc.mytaskmanager.model;
+package com.github.johnnysc.mytaskmanager.bean;
 
 import android.support.annotation.IntDef;
 

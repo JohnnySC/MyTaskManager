@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.model.Task;
+import com.github.johnnysc.mytaskmanager.bean.Task;
 
 import io.realm.RealmList;
 
