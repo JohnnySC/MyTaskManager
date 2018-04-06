@@ -3,6 +3,7 @@ package com.github.johnnysc.mytaskmanager;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,6 +61,7 @@ public class MainActivityTest extends BaseTest {
             pressBack(i < mCategories.size() / 2);
             checkMainText(i, 0);
         }
+        Log.i("TEST", "testMainAndCreate successful");
     }
 
     /**
@@ -67,7 +69,7 @@ public class MainActivityTest extends BaseTest {
      */
     @Test
     public void testSaveEditAndDelete() {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < mCategories.size(); i++) {
             createAndEditTask(i);
             // 3. delete task
             onView(withId(R.id.data_layout)).perform(swipeLeft());
@@ -86,8 +88,13 @@ public class MainActivityTest extends BaseTest {
             pressBack(false);
             checkMainText(i, 0);
         }
+        Log.i("TEST", "testSaveEditAndDelete successful");
+
     }
 
+    /**
+     * Here we create a task, then try to edit, but press back and cancel it
+     */
     @Test
     public void testCancelEdit() {
         createAndEditTask(1);
@@ -97,15 +104,18 @@ public class MainActivityTest extends BaseTest {
         checkFabImage(android.R.drawable.ic_menu_save);
         onView(withId(R.id.title_edit_text)).perform(scrollTo(), typeText(TEXT_TO_BE_TYPED));
         onView(withId(R.id.body_edit_text)).perform(scrollTo(), typeText(TEXT_TO_BE_TYPED));
-        // TODO: 05.04.18 add some special logic later
-        pressBack(true);
+        setDateAndCheck(2019, 12,11,10,19);
+        checkCheckBoxState(R.id.alarm_check_box, false, NOTIFY);
         pressBack(true);
         checkFabImage(android.R.drawable.ic_menu_edit);
         onView(withId(R.id.title_edit_text)).perform(scrollTo()).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
         onView(withId(R.id.body_edit_text)).perform(scrollTo()).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
+        checkDate(2018, 10,15,11,30);
+        checkCheckBoxState(R.id.alarm_check_box, false, NOTIFY);
         pressBack(true);
         onView(withId(R.id.title_text_view)).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
         onView(withId(R.id.body_text_view)).check(matches(withText(NEW_TEXT_TO_BE_TYPED)));
+        Log.i("TEST", "testCancelEdit successful");
     }
 
     private void createAndEditTask(int layoutIndex) {

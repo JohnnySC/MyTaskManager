@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.github.johnnysc.mytaskmanager.CRUDTaskActivity;
 import com.github.johnnysc.mytaskmanager.bean.CategoryType;
+import com.github.johnnysc.mytaskmanager.crud.CRUDModelImpl;
+import com.github.johnnysc.mytaskmanager.crud.CRUDTaskActivity;
 
-import static com.github.johnnysc.mytaskmanager.CRUDTaskActivity.READ;
 
 /**
  * Need this service to go and read the task from notification
@@ -40,7 +40,7 @@ public class NotificationActionService extends IntentService {
         if (extras == null) return;
         int taskType = extras.getInt(EXTRA_TASK_TYPE);
         long taskId = extras.getLong(EXTRA_TASK_ID);
-        Intent newIntent = CRUDTaskActivity.newIntent(this, taskType, READ, taskId);
+        Intent newIntent = CRUDTaskActivity.newIntent(this, taskType, CRUDModelImpl.READ, taskId);
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(newIntent);
     }

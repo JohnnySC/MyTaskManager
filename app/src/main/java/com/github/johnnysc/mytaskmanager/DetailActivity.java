@@ -12,6 +12,8 @@ import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
 import com.github.johnnysc.mytaskmanager.adapter.TaskInteractListener;
 import com.github.johnnysc.mytaskmanager.bean.CategoryType;
 import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.crud.CRUDModelImpl;
+import com.github.johnnysc.mytaskmanager.crud.CRUDTaskActivity;
 
 import java.util.Collections;
 
@@ -77,7 +79,7 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
 
     @Override
     public void viewTask(long id) {
-        startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDTaskActivity.READ, id), REQUEST_CODE);
+        startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDModelImpl.READ, id), REQUEST_CODE);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
         super.initFab();
         mActionButton.setImageResource(android.R.drawable.ic_input_add);
         mActionButton.setOnClickListener(view ->
-                startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDTaskActivity.CREATE), REQUEST_CODE));
+                startActivityForResult(CRUDTaskActivity.newIntent(this, mTaskType, CRUDModelImpl.CREATE), REQUEST_CODE));
     }
 
     @Override

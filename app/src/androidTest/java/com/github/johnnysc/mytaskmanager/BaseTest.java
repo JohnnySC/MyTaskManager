@@ -77,6 +77,10 @@ abstract class BaseTest {
 
     void setDateAndCheck(int year, int month, int day, int hours, int minutes) {
         setDate(R.id.time_text_view, year, month, day, hours, minutes);
+        checkDate(year, month, day, hours, minutes);
+    }
+
+    void checkDate(int year, int month, int day, int hours, int minutes) {
         String date = String.format("%d/%d/%d %d:%d", day, month, year, hours, minutes);
         onView(withId(R.id.time_text_view)).check(matches(withText(date)));
     }

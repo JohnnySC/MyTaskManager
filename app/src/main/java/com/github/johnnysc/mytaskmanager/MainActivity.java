@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.github.johnnysc.mytaskmanager.bean.Category;
 import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.crud.CRUDModelImpl;
+import com.github.johnnysc.mytaskmanager.crud.CRUDTaskActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +96,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void handleButtonClick(@TaskType int taskType) {
-        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDTaskActivity.CREATE), REQUEST_CODE);
+        startActivityForResult(CRUDTaskActivity.newIntent(this, taskType, CRUDModelImpl.CREATE), REQUEST_CODE);
     }
 
     private int getNotDoneTasksCount(RealmList<Task> tasks) {
