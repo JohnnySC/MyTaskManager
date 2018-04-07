@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -263,7 +264,12 @@ public class CRUDTaskActivity extends BaseActivity implements CRUDView, DatePick
     @Override
     public void scheduleNotification(int id, long futureInMillis, long taskId, int taskType) {
         if (mAlarmManager == null) return;
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, futureInMillis, makePendingIntent(id, taskId, taskType, false));
+        PendingIntent pendingIntent = makePendingIntent(id, taskId, taskType, false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, futureInMillis, pendingIntent);
+        } else {
+            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, futureInMillis, pendingIntent);
+        }
     }
 
     @Override
