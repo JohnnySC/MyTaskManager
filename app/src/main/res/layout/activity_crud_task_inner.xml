@@ -92,7 +92,7 @@
                 android:id="@+id/title_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="task title text"/>
+                android:hint="@string/minimum"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -108,7 +108,7 @@
                 android:id="@+id/body_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="task text long "/>
+                tools:text="minimum 5 symbols"/>
 
         </android.support.design.widget.TextInputLayout>
 

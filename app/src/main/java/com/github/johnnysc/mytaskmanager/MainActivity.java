@@ -2,6 +2,7 @@ package com.github.johnnysc.mytaskmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -46,12 +47,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             MAIN_MAP.put(LAYOUT_ID_LIST.get(i), CATEGORY_TYPES.get(i));
         }
     }
+
     private List<MainActivity.MainItem> mMainItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initRefreshLayout();
         initRealm();
         initMainItems();
     }
@@ -76,6 +79,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     //region private methods
 
+    private void initRefreshLayout() {
+        SwipeRefreshLayout refreshLayout = findViewById(R.id.swipe_refresh_layout);
+        refreshLayout.setOnRefreshListener(() -> {
+            refreshLayout.setRefreshing(true);
+            updateMainItemsTexts();
+            refreshLayout.setRefreshing(false);
+        });
+    }
+
     private void initMainItems() {
         mMainItems = new ArrayList<>();
         for (int i = 0; i < LAYOUT_ID_LIST.size(); i++) {
@@ -88,6 +100,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void updateMainItemsTexts() {
+        if (mMainItems == null || mMainItems.isEmpty()) return;
         for (int i = 0; i < mMainItems.size(); i++) {
             Category category = getCategoryByPrimaryKey(CATEGORY_TYPES.get(i));
             String text = getString(CATEGORY_STRINGS.get(i)) + "\n" + getNotDoneTasksCount(category.getTasks());

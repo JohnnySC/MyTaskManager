@@ -67,9 +67,7 @@ interface CRUDView {
                               long taskId,
                               @CategoryType.TaskType int taskType);
 
-    void cancelNotification(int id,
-                            long taskId,
-                            @CategoryType.TaskType int taskType);
+    void cancelNotification(int id);
 
     void setResultOkAndFinish();
 }

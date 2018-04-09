@@ -152,6 +152,8 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
         CustomTouchHelperCallback itemTouchCallback = new CustomTouchHelperCallback(0, ItemTouchHelper.LEFT, this);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+        sortData();
+        mAdapter.notifyDataSetChanged();
     }
 
     //endregion

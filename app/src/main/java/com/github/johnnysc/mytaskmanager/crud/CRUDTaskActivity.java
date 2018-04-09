@@ -1,12 +1,12 @@
 package com.github.johnnysc.mytaskmanager.crud;
 
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -27,8 +27,12 @@ import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerCallback;
 import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerFragment;
 import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerCallback;
 import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerFragment;
-import com.github.johnnysc.mytaskmanager.notifications.NotificationActionService;
-import com.github.johnnysc.mytaskmanager.notifications.TaskBroadcastReceiver;
+import com.github.johnnysc.mytaskmanager.notifications.NotificationJobService;
+
+import java.util.Date;
+
+import static com.github.johnnysc.mytaskmanager.notifications.NotificationJobService.EXTRA_NOTIFICATION_TASK_ID;
+import static com.github.johnnysc.mytaskmanager.notifications.NotificationJobService.EXTRA_NOTIFICATION_TASK_TYPE;
 
 /**
  * Here we can Create, Read, Update and Delete the task.
@@ -54,7 +58,9 @@ public class CRUDTaskActivity extends BaseActivity implements CRUDView, DatePick
     private TextInputEditText mBodyEditText;
 
     private MenuItem mDeleteMenuItem;
-    private AlarmManager mAlarmManager;
+    private JobScheduler mJobScheduler;
+    private ComponentName mComponentName;
+
     private CRUDPresenter mPresenter;
 
     public static Intent newIntent(Context context,
@@ -80,7 +86,8 @@ public class CRUDTaskActivity extends BaseActivity implements CRUDView, DatePick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crud_task);
-        mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        mComponentName = new ComponentName(this, NotificationJobService.class);
         mPresenter = new CRUDPresenterImpl(this);
         int actionType = getIntent().getIntExtra(EXTRA_ACTION_TYPE, 0);
         long taskId = getIntent().getLongExtra(EXTRA_TASK_ID, -1L);
@@ -263,19 +270,21 @@ public class CRUDTaskActivity extends BaseActivity implements CRUDView, DatePick
 
     @Override
     public void scheduleNotification(int id, long futureInMillis, long taskId, int taskType) {
-        if (mAlarmManager == null) return;
-        PendingIntent pendingIntent = makePendingIntent(id, taskId, taskType, false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, futureInMillis, pendingIntent);
-        } else {
-            mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, futureInMillis, pendingIntent);
-        }
+        long minimumLatency = futureInMillis - new Date().getTime(); //getting the diff
+        PersistableBundle extras = new PersistableBundle();
+        extras.putLong(EXTRA_NOTIFICATION_TASK_ID, taskId);
+        extras.putInt(EXTRA_NOTIFICATION_TASK_TYPE, taskType);
+        JobInfo jobInfo = new JobInfo.Builder(id, mComponentName)
+                .setMinimumLatency(minimumLatency)
+                .setOverrideDeadline(minimumLatency + 1000) //do it after 1 sec if didn't already
+                .setExtras(extras)
+                .build();
+        mJobScheduler.schedule(jobInfo);
     }
 
     @Override
-    public void cancelNotification(int id, long taskId, int taskType) {
-        if (mAlarmManager == null) return;
-        mAlarmManager.cancel(makePendingIntent(id, taskId, taskType, true));
+    public void cancelNotification(int id) {
+        mJobScheduler.cancel(id);
     }
 
     @Override
@@ -283,26 +292,5 @@ public class CRUDTaskActivity extends BaseActivity implements CRUDView, DatePick
         Intent intent = new Intent();
         setResult(RESULT_OK, intent);
         finish();
-    }
-
-    private PendingIntent makePendingIntent(int id, long taskId, int taskType, boolean cancel) {
-        Intent notificationIntent = TaskBroadcastReceiver.newIntent(this, id, getNotification(taskId, taskType), cancel);
-        notificationIntent.setAction(String.valueOf(id)); //needs to show different notifications
-        return PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
-    }
-
-    private Notification getNotification(long taskId, int taskType) {
-        Intent actionIntent = NotificationActionService.newIntent(this, taskId, taskType);
-        actionIntent.setAction(String.valueOf(taskId)); //needs to show different notifications
-        PendingIntent actionPendingIntent = PendingIntent.getService(this, 0, actionIntent, PendingIntent.FLAG_ONE_SHOT);
-        return new Notification.Builder(this)
-                .setContentTitle(mTitleEditText.getText().toString())
-                .setContentText(mBodyEditText.getText().toString())
-                .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setContentIntent(actionPendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .build();
     }
 }

@@ -17,4 +17,5 @@
     <string name="done">Готово</string>
     <string name="alarm">Оповестить</string>
     <string name="choose_date">Дата и время оповещеня</string>
+    <string name="minimum">Минимум 5 символов (и для описания)</string>
 </resources>

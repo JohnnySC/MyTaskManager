@@ -153,8 +153,8 @@ public final class CRUDPresenterImpl implements CRUDPresenter {
     }
 
     @Override
-    public void cancelNotification(int id, long taskId, int taskType) {
-        mView.cancelNotification(id, taskId, taskType);
+    public void cancelNotification(int id) {
+        mView.cancelNotification(id);
     }
 
     @Override

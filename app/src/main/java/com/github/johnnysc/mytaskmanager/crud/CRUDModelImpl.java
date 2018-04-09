@@ -144,7 +144,7 @@ public final class CRUDModelImpl implements CRUDModel {
             if (notify && mNotifyDate != null) {
                 mPresenter.scheduleNotification((int) mTaskId, mNotifyDate.getTime(), mTaskId, mTaskType);
             } else if (!notify) {
-                mPresenter.cancelNotification((int) mTaskId, mTaskId, mTaskType);
+                mPresenter.cancelNotification((int) mTaskId);
             }
             mPresenter.setResultOkAndFinish();
         }
