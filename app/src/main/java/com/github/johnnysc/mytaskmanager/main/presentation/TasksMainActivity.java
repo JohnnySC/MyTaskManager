@@ -8,12 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.github.johnnysc.mytaskmanager.DetailActivity;
+import com.github.johnnysc.mytaskmanager.details.presentation.TaskListActivity;
 import com.github.johnnysc.mytaskmanager.MyTaskApplication;
 import com.github.johnnysc.mytaskmanager.R;
 import com.github.johnnysc.mytaskmanager.crud.CRUDModelImpl;
 import com.github.johnnysc.mytaskmanager.crud.CRUDTaskActivity;
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 import com.github.johnnysc.mytaskmanager.main.presentation.adapter.AddNewTaskClickListener;
 import com.github.johnnysc.mytaskmanager.main.presentation.adapter.TaskCategoriesAdapter;
 import com.github.johnnysc.mytaskmanager.main.presentation.adapter.TaskCategoryClickListener;
@@ -61,7 +61,7 @@ public class TasksMainActivity extends AppCompatActivity implements TasksMainVie
     }
 
     @Override
-    public void showTasksInfo(List<TaskCategoryDataModel> taskCategoryDataModels) {
+    public void showTasksInfo(List<TaskTypeDataModel> taskCategoryDataModels) {
         mTasksRecyclerView.setAdapter(new TaskCategoriesAdapter(taskCategoryDataModels, this, this));
     }
 
@@ -74,7 +74,7 @@ public class TasksMainActivity extends AppCompatActivity implements TasksMainVie
     @Override
     public void onTaskCategoryClick(int categoryPosition) {
         mTasksMainPresenter.clear();
-        startActivity(DetailActivity.newIntent(this, categoryPosition));
+        startActivity(TaskListActivity.newIntent(this, categoryPosition));
     }
 
     private void initUi() {

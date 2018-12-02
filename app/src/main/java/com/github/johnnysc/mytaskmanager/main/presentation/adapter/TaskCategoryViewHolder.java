@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 
 /**
  * @author Asatryan on 02.12.18
@@ -31,7 +31,7 @@ final class TaskCategoryViewHolder extends RecyclerView.ViewHolder {
         mAddNewTaskClickListener = addNewTaskClickListener;
     }
 
-    void bind(TaskCategoryDataModel taskCategoryDataModel) {
+    void bind(TaskTypeDataModel taskCategoryDataModel) {
         final int layoutPosition = getLayoutPosition();
         itemView.setOnClickListener(v -> mTaskCategoryClickListener.onTaskCategoryClick(layoutPosition));
         mTaskCategoryTitleTextView.setText(taskCategoryDataModel.getTitleResId());

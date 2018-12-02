@@ -11,6 +11,7 @@ import dagger.Provides;
 /**
  * @author Asatryan on 02.12.18
  */
+@Singleton
 @Module
 public class AppModule {
 

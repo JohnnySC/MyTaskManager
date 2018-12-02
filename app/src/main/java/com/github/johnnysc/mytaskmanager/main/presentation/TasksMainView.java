@@ -1,6 +1,6 @@
 package com.github.johnnysc.mytaskmanager.main.presentation;
 
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 
 import java.util.List;
 
@@ -9,5 +9,5 @@ import java.util.List;
  */
 public interface TasksMainView {
 
-    void showTasksInfo(List<TaskCategoryDataModel> taskCategoryDataModels);
+    void showTasksInfo(List<TaskTypeDataModel> taskCategoryDataModels);
 }

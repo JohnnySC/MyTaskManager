@@ -1,4 +1,4 @@
-package com.github.johnnysc.mytaskmanager.adapter;
+package com.github.johnnysc.mytaskmanager.details.presentation.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

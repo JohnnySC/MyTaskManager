@@ -1,6 +1,6 @@
 package com.github.johnnysc.mytaskmanager.main.domain;
 
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 
 import java.util.List;
 
@@ -13,6 +13,6 @@ public interface TasksMainInteractor extends DataCallbackSetter<TasksMainInterac
 
     interface DataCallback {
 
-        void provideTasksData(List<TaskCategoryDataModel> taskCategoryDataModels);
+        void provideTasksData(List<TaskTypeDataModel> taskCategoryDataModels);
     }
 }

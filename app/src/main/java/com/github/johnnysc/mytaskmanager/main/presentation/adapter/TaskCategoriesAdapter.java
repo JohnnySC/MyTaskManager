@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 
 import java.util.List;
 
@@ -16,11 +16,11 @@ import java.util.List;
  */
 public final class TaskCategoriesAdapter extends RecyclerView.Adapter<TaskCategoryViewHolder> {
 
-    private final List<TaskCategoryDataModel> mTaskCategoryDataModels;
+    private final List<TaskTypeDataModel> mTaskCategoryDataModels;
     private final TaskCategoryClickListener mTaskCategoryClickListener;
     private final AddNewTaskClickListener mAddNewTaskClickListener;
 
-    public TaskCategoriesAdapter(List<TaskCategoryDataModel> taskCategoryDataModels,
+    public TaskCategoriesAdapter(List<TaskTypeDataModel> taskCategoryDataModels,
                                  TaskCategoryClickListener taskCategoryClickListener,
                                  AddNewTaskClickListener addNewTaskClickListener) {
         mTaskCategoryDataModels = taskCategoryDataModels;

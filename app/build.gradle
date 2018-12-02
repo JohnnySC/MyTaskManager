@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+androidExtensions {
+    experimental = true
+}
 
 android {
     compileSdkVersion 28
@@ -38,6 +43,12 @@ dependencies {
     //Dagger
     implementation "com.google.dagger:dagger:2.14.1"
     annotationProcessor "com.google.dagger:dagger-compiler:2.14.1"
+
+    //Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    //Realm
+    implementation 'io.realm:realm-android:0.87.5'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

@@ -1,6 +1,6 @@
 package com.github.johnnysc.mytaskmanager.main.presentation;
 
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 import com.github.johnnysc.mytaskmanager.main.domain.TasksMainInteractor;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public final class TasksMainPresenterImpl extends BasePresenter<TasksMainView> i
     }
 
     @Override
-    public void provideTasksData(List<TaskCategoryDataModel> taskCategoryDataModels) {
+    public void provideTasksData(List<TaskTypeDataModel> taskCategoryDataModels) {
         doSafely(() -> getView().showTasksInfo(taskCategoryDataModels));
     }
 }

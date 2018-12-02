@@ -1,6 +1,8 @@
 package com.github.johnnysc.mytaskmanager.main.domain;
 
-import com.github.johnnysc.mytaskmanager.main.data.model.TaskCategoryDataModel;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.TaskTypeDataModel;
 
 import java.util.List;
 
@@ -9,5 +11,19 @@ import java.util.List;
  */
 public interface TasksRepository {
 
-    List<TaskCategoryDataModel> getTasksCategoryDataModels();
+    List<TaskTypeDataModel> getTasksCategoryDataModels();
+
+    List<Task> getTasksSorted(@CategoryType.TaskType int taskType);
+
+    void moveTask(@CategoryType.TaskType int taskType, int oldPosition, int newPosition);
+
+    Task getTask(@CategoryType.TaskType int taskType, int position);
+
+    void setTaskDone(long id, boolean done);
+
+    void sortTaskList(@CategoryType.TaskType int taskType);
+
+    void removeTask(long id);
+
+    int getCategoryTitle(@CategoryType.TaskType int taskType);
 }

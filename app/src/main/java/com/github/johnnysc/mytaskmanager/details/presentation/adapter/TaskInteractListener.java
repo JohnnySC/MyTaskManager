@@ -1,4 +1,4 @@
-package com.github.johnnysc.mytaskmanager.adapter;
+package com.github.johnnysc.mytaskmanager.details.presentation.adapter;
 
 import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 

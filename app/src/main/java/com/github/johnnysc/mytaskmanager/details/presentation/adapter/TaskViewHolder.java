@@ -1,4 +1,4 @@
-package com.github.johnnysc.mytaskmanager.adapter;
+package com.github.johnnysc.mytaskmanager.details.presentation.adapter;
 
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +16,10 @@ import com.github.johnnysc.mytaskmanager.R;
 
 final class TaskViewHolder extends RecyclerView.ViewHolder {
 
-    private LinearLayout mDataLayout;
-    private TextView mTitle;
-    private TextView mBody;
-    private CheckBox mCheckBox;
+    private final LinearLayout mDataLayout;
+    private final TextView mTitle;
+    private final TextView mBody;
+    private final CheckBox mCheckBox;
 
     TaskViewHolder(View itemView) {
         super(itemView);
