@@ -6,9 +6,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.bean.Category;
-import com.github.johnnysc.mytaskmanager.bean.CategoryType;
-import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.Category;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

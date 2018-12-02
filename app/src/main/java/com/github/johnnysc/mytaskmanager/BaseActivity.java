@@ -6,9 +6,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.github.johnnysc.mytaskmanager.bean.Category;
-import com.github.johnnysc.mytaskmanager.bean.CategoryType;
-import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.Category;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 
 import java.util.Arrays;
 import java.util.List;

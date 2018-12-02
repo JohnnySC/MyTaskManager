@@ -1,6 +1,6 @@
 package com.github.johnnysc.mytaskmanager.crud;
 
-import com.github.johnnysc.mytaskmanager.bean.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
 
 /**
  * @author Asatryan on 05.04.18.

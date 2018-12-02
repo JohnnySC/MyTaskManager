@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.github.johnnysc.mytaskmanager.bean.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
 import com.github.johnnysc.mytaskmanager.crud.CRUDModelImpl;
 import com.github.johnnysc.mytaskmanager.crud.CRUDTaskActivity;
 

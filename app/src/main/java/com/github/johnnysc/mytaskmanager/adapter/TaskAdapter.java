@@ -6,9 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 
-import io.realm.RealmList;
+import java.util.List;
 
 /**
  * To show tasks in list
@@ -19,11 +19,11 @@ import io.realm.RealmList;
 public final class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
 
     private final TaskInteractListener mTaskInteractListener;
-    private RealmList<Task> mTasks;
+    private List<Task> mTasks;
     private boolean mOnBind;
 
     public TaskAdapter(TaskInteractListener taskCheckListener,
-                       RealmList<Task> tasks) {
+                       List<Task> tasks) {
         mTaskInteractListener = taskCheckListener;
         mTasks = tasks;
     }

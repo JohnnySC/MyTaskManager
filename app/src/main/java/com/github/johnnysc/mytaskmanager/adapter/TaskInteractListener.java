@@ -1,6 +1,6 @@
 package com.github.johnnysc.mytaskmanager.adapter;
 
-import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 
 /**
  * Additional actions with task when in the list

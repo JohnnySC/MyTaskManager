@@ -10,15 +10,18 @@ import android.view.MenuItem;
 import com.github.johnnysc.mytaskmanager.adapter.CustomTouchHelperCallback;
 import com.github.johnnysc.mytaskmanager.adapter.TaskAdapter;
 import com.github.johnnysc.mytaskmanager.adapter.TaskInteractListener;
-import com.github.johnnysc.mytaskmanager.bean.CategoryType;
-import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.Category;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 import com.github.johnnysc.mytaskmanager.crud.CRUDModelImpl;
 import com.github.johnnysc.mytaskmanager.crud.CRUDTaskActivity;
+import com.github.johnnysc.mytaskmanager.main.presentation.TasksMainActivity;
 
 import java.util.Collections;
 
 import io.realm.RealmList;
-import io.realm.RealmResults;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Here is the list of all the task of chosen category
@@ -29,7 +32,6 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
 
     private static final int REQUEST_CODE = 2;
     private TaskAdapter mAdapter;
-    private boolean mDataChanged;
 
     public static Intent newIntent(Context context, @CategoryType.TaskType int taskType) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -64,11 +66,7 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
 
     @Override
     public void onBackPressed() {
-        if (mDataChanged) {
-            Intent intent = new Intent();
-            setResult(RESULT_OK, intent);
-        }
-        super.onBackPressed();
+        startActivity(TasksMainActivity.newIntent(this));
     }
 
     @Override
@@ -106,11 +104,11 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
             return;
         }
         mRealm.executeTransaction(realm -> {
-            RealmResults<Task> rows = realm.where(Task.class).equalTo("id", id).findAll();
-            rows.clear();
+            Task task = realm.where(Task.class).equalTo("id", id).findFirst();
+            if (task != null)
+                task.deleteFromRealm();
         });
         mAdapter.notifyDataSetChanged();
-        mDataChanged = true;
     }
 
     //region private methods
@@ -118,11 +116,11 @@ public class DetailActivity extends BaseActivity implements TaskInteractListener
     private void updateData() {
         sortData();
         mAdapter.notifyDataSetChanged();
-        mDataChanged = true;
     }
 
     private void initAdapter() {
-        mAdapter = new TaskAdapter(this, getCategoryByPrimaryKey(mTaskType).getTasks());
+        final Category category = getCategoryByPrimaryKey(mTaskType);
+        mAdapter = new TaskAdapter(this, category == null ? emptyList() : category.getTasks());
     }
 
     private void sortData() {

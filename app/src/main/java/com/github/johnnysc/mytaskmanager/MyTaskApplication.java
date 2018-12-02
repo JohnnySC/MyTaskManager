@@ -2,8 +2,11 @@ package com.github.johnnysc.mytaskmanager;
 
 import android.app.Application;
 
+import com.github.johnnysc.mytaskmanager.main.di.AppComponent;
+import com.github.johnnysc.mytaskmanager.main.di.AppModule;
+import com.github.johnnysc.mytaskmanager.main.di.DaggerAppComponent;
+
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 /**
  * @author JohnnySC on 19.03.18.
@@ -11,12 +14,26 @@ import io.realm.RealmConfiguration;
 
 public class MyTaskApplication extends Application {
 
+    private static MyTaskApplication sInstance;
+    private AppComponent mAppComponent;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        RealmConfiguration configuration = new RealmConfiguration.Builder(this)
-                .deleteRealmIfMigrationNeeded()
+        sInstance = this;
+
+        mAppComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
                 .build();
-        Realm.setDefaultConfiguration(configuration);
+
+       Realm.init(this);
+    }
+
+    public static MyTaskApplication getInstance() {
+        return sInstance;
+    }
+
+    public AppComponent getAppComponent() {
+        return mAppComponent;
     }
 }

@@ -12,7 +12,7 @@ import android.os.Build;
 import android.os.PersistableBundle;
 
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.bean.Task;
+import com.github.johnnysc.mytaskmanager.main.data.model.Task;
 
 import io.realm.Realm;
 

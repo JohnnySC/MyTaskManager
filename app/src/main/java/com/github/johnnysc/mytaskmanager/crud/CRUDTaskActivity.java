@@ -22,7 +22,7 @@ import android.widget.TimePicker;
 
 import com.github.johnnysc.mytaskmanager.BaseActivity;
 import com.github.johnnysc.mytaskmanager.R;
-import com.github.johnnysc.mytaskmanager.bean.CategoryType;
+import com.github.johnnysc.mytaskmanager.main.data.model.CategoryType;
 import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerCallback;
 import com.github.johnnysc.mytaskmanager.dateandtime.DatePickerFragment;
 import com.github.johnnysc.mytaskmanager.dateandtime.TimePickerCallback;
